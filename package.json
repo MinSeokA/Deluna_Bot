@@ -1,0 +1,36 @@
+{
+  "name": "deluna",
+  "version": "1.0.0",
+  "description": "A Discord bot for the DeLuna server.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "TFAGaming",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/rest": "^2.4.0",
+    "@discordjs/voice": "^0.17.0",
+    "@distube/soundcloud": "^2.0.3",
+    "@distube/spotify": "^2.0.2",
+    "@distube/youtube": "^1.0.4",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "axios": "^1.7.7",
+    "colors": "^1.4.0",
+    "discord-api-types": "^0.37.102",
+    "discord.js": "^14.16.3",
+    "discordjs-v14-bot-template": "file:",
+    "distube": "^5.0.2",
+    "dotenv": "^16.4.5",
+    "node-opus": "^0.3.3",
+    "opusscript": "^0.0.8",
+    "quick-yaml.db": "^1.2.2",
+    "soundcloud-api-client": "^0.0.9",
+    "spotify-url-info": "^3.2.17",
+    "spotify-web-api-node": "^5.0.2",
+    "ytdl-core": "^4.11.5"
+  }
+}
