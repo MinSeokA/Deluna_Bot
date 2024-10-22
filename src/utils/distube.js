@@ -1,5 +1,6 @@
 const client = require("../index.js");
 const { EmbedBuilder, Colors } = require("discord.js");
+const { error } = require("./Console.js");
 
 const Format = Intl.NumberFormat();
 
@@ -56,8 +57,6 @@ client.music.on("addSong", async (queue, song) => {
 
 
 client.music.on("addList", async (queue, playlist) => {
-    console.log(playlist);
-    console.log(queue);
     const msg = await queue.textChannel.send({
         embeds: [
             new EmbedBuilder()
@@ -204,7 +203,6 @@ client.music.on("finish", async (queue) => {
 });
 
 client.music.on("initQueue", async (queue) => {
-    queue.autoplay = true;
     queue.volume = 100;
 });
 
@@ -220,3 +218,8 @@ client.music.on("noRelated", async (queue) => {
         msg.delete();
     }, 20000);
 });
+
+client.music.on("error", (channel, error) => {
+    console.log(error);
+    console.log(channel);
+})

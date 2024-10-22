@@ -12,7 +12,8 @@ module.exports = new ApplicationCommand({
         default_member_permissions: `${PermissionFlagsBits.Administrator}`
     },
     options: {
-        cooldown: 10000
+        cooldown: 1000,
+        guildOwner: true
     },
     /**
      * 

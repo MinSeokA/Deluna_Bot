@@ -17,7 +17,15 @@ class CommandsHandler {
     }
 
     load = () => {
+        // 디렉토리마다 순회
         for (const directory of readdirSync('./src/commands/')) {
+
+            // 디렉토리 시작 시 메시지 출력
+            info('╔═══════════════════════════════════════════╗');
+            info('║ Loading commands from directory: ' + directory + ' ║');
+            info('╚═══════════════════════════════════════════╝');
+
+            // 각 디렉토리 안의 파일들 순회
             for (const file of readdirSync('./src/commands/' + directory).filter((f) => f.endsWith('.js'))) {
                 try {
                     /**
@@ -41,8 +49,12 @@ class CommandsHandler {
                             });
                         }
 
-                        info('새로운 메시지 명령어 로드 완료: ' + file);
+                        // 각 파일별로 로드 완료 메시지 출력
+                        info('├─ 📂 파일: ' + file);
+                        info('│   └── 새로운 메시지 명령어 로드 완료!');
+                        info('──────────────────────────────────────────');
                     } else if (module.__type__ === 1) {
+                        // 애플리케이션 명령어 처리
                         if (!module.command || !module.run) {
                             error('애플리케이션 명령어를 로드할 수 없습니다: ' + file);
                             continue;
@@ -51,7 +63,10 @@ class CommandsHandler {
                         this.client.collection.application_commands.set(module.command.name, module);
                         this.client.rest_application_commands_array.push(module.command);
 
-                        info('새로운 애플리케이션 명령어 로드 완료: ' + file);
+                        // 각 파일별로 로드 완료 메시지 출력
+                        info('├─ 📂 파일: ' + file);
+                        info('│   └── 새로운 애플리케이션 명령어 로드 완료!');
+                        info('──────────────────────────────────────────');
                     } else {
                         error('잘못된 명령어 유형: ' + module.__type__ + ' (명령어 파일: ' + file + ')');
                     }
@@ -61,6 +76,7 @@ class CommandsHandler {
             }
         }
 
+        // 최종 로드 완료 메시지
         success(`성공적으로 ${this.client.collection.application_commands.size}개의 애플리케이션 명령어와 ${this.client.collection.message_commands.size}개의 메시지 명령어를 로드했습니다.`);
     }
 
@@ -72,7 +88,7 @@ class CommandsHandler {
 
         this.load();
     }
-    
+
     /**
      * @param {{ enabled: boolean, guildId: string }} development
      * @param {Partial<import('discord.js').RESTOptions>} restOptions 

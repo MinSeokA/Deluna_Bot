@@ -1,4 +1,4 @@
-const { PermissionsBitField, ChannelType } = require("discord.js");
+const { PermissionsBitField, ChannelType, EmbedBuilder, Colors } = require("discord.js");
 const DiscordBot = require("../DiscordBot");
 const config = require("../../config");
 const MessageCommand = require("../../structure/MessageCommand");
@@ -17,43 +17,59 @@ class CommandsListener {
 
             if (!config.commands.message_commands) return;
 
-            let prefix = client.api.getData(`guilds/${message.guild.id}`).prefix || config.commands.prefix;
-
-            if (!message.content.startsWith(prefix)) return;
-
-            const args = message.content.slice(prefix.length).trim().split(/\s+/g);
-            const commandInput = args.shift().toLowerCase();
-
-            if (!commandInput.length) return;
-
-            /**
-             * @type {MessageCommand['data']}
-             */
-            const command =
-                client.collection.message_commands.get(commandInput) ||
-                client.collection.message_commands.get(client.collection.message_commands_aliases.get(commandInput));
-
-            if (!command) return;
-
             try {
-                if (command.options) {
-                    const commandContinue = await handleMessageCommandOptions(message, command.options, command.command);
+                let prefix = client.api.getData(`guilds/${message.guild.id}`).prefix
 
-                    if (!commandContinue) return;
+                if (!message.content.startsWith(prefix)) return;
+
+                const args = message.content.slice(prefix.length).trim().split(/\s+/g);
+                const commandInput = args.shift().toLowerCase();
+
+                if (!commandInput.length) return;
+
+                /**
+                 * @type {MessageCommand['data']}
+                 */
+                const command =
+                    client.collection.message_commands.get(commandInput) ||
+                    client.collection.message_commands.get(client.collection.message_commands_aliases.get(commandInput));
+
+                if (!command) return;
+
+                try {
+                    if (command.options) {
+                        const commandContinue = await handleMessageCommandOptions(message, command.options, command.command);
+
+                        if (!commandContinue) return;
+                    }
+
+                    if (command.command?.permissions && !message.member.permissions.has(PermissionsBitField.resolve(command.command.permissions))) {
+                        await message.reply({
+                            content: config.messages.MISSING_PERMISSIONS,
+                            ephemeral: true
+                        });
+
+                        return;
+                    }
+
+                    command.run(client, message, args);
+                } catch (err) {
+                    error(err);
                 }
-
-                if (command.command?.permissions && !message.member.permissions.has(PermissionsBitField.resolve(command.command.permissions))) {
-                    await message.reply({
-                        content: config.messages.MISSING_PERMISSIONS,
-                        ephemeral: true
-                    });
-
-                    return;
-                }
-
-                command.run(client, message, args);
             } catch (err) {
-                error(err);
+                return message.channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle('오류 발생')
+                            .setDescription('API에서 접두사를 불러오는 도중 오류가 발생했습니다.')
+                            .setColor(Colors.Red)
+                            .setTimestamp()
+                            .setFooter({
+                                text: message.author.tag,
+                                iconURL: message.author.displayAvatarURL()
+                            })
+                    ]
+                });
             }
         });
 
