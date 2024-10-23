@@ -203,6 +203,7 @@ module.exports = new ApplicationCommand({
 
         if (songs.length > 0) {
           const playlist = await client.music.createCustomPlaylist(songs);
+          console.log(playlist);
           await client.music.play(voiceChannel, playlist, {
             textChannel: interaction.channel,
             member: interaction.member,

@@ -73,7 +73,7 @@ module.exports = new ApplicationCommand({
             ephemeral: true,
         });
 
-        client.music.play(voiceChannel, keyword, {
+        await client.music.play(voiceChannel, keyword, {
             textChannel: interaction.channel,
             member: interaction.member,
         });

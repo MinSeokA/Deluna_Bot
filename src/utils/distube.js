@@ -96,58 +96,21 @@ client.music.on("playSong", async (queue, song) => {
         embeds: [
             new EmbedBuilder()
                 .setColor(Colors.Green)
-                .setAuthor({
-                    name: "현재 재생 중",
-                    iconURL: client.user.avatarURL(),
-                })
-                .setDescription(`> [**${song.name}**](${song.url})`)
-                .setThumbnail(song.user.displayAvatarURL())
-                .addFields([
-                    {
-                        name: "🔷 | 상태",
-                        value: `${status(queue).toString()}`,
-                        inline: false,
-                    },
-                    {
-                        name: "👀 | 조회수",
-                        value: `${Format.format(song.views)}`,
-                        inline: true,
-                    },
-                    {
-                        name: "👍 | 좋아요",
-                        value: `${Format.format(song.likes)}`,
-                        inline: true,
-                    },
-                    {
-                        name: "⏱️ | 시간",
-                        value: `${song.formattedDuration}`,
-                        inline: true,
-                    },
-                    {
-                        name: "🎵 | 업로더",
-                        value: `[${song.uploader.name}](${song.uploader.url})`,
-                        inline: true,
-                    },
-                    {
-                        name: "👌 | 요청자",
-                        value: `${song.user}`,
-                        inline: true,
-                    },
-                    {
-                        name: "📻 | 음악 재생 위치",
-                        value: `
-┕🔊 | ${client.channels.cache.get(queue.voiceChannel.id)}
-┕🪄 | ${queue.voiceChannel.bitrate / 1000} kbps`,
-                        inline: false,
-                    },
-                    {
-                        name: "🤖 | 추천 곡",
-                        value: `[${song.related[0].title}](https://www.youtube.com/watch?v=${song.related[0].id})
-┕🆙 | 업로더: [${song.related[0].author.user}](${song.related[0].author.channel_url})`,
-                        inline: false,
-                    },
-                ])
-                .setImage(song.thumbnail)
+                .setTitle(`🎵 | 재생 중: ${song.name}`)
+                .setURL(song.url)
+                .setDescription(`
+
+                > 🔷 | 상태:  ${status(queue).toString()}
+
+                > 🎵 | 업로더: [${song.uploader.name}](${song.uploader.url})
+                > 👌 | 요청자: ${song.user}
+                > ⏱️ | 시간: ${song.formattedDuration}
+                
+                > 🤖 | 추천 곡: [${song.related[0].title}](https://www.youtube.com/watch?v=${song.related[0].id})
+                > 🆙 | 업로더: [${song.related[0].author.user}](${song.related[0].author.channel_url})
+
+                `)
+                .setThumbnail(song.thumbnail)
                 .setFooter({
                     text: `${Format.format(queue.songs.length)} 곡이 대기 중입니다.`,
                 }),

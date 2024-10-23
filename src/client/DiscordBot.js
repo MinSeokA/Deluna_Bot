@@ -61,9 +61,6 @@ class DiscordBot extends Client {
             emitNewSongOnly: true,
             emitAddSongWhenCreatingQueue: true,
             emitAddListWhenCreatingQueue: true,
-            ffmpeg: {
-                path: require('@ffmpeg-installer/ffmpeg').path
-            },
             plugins: [
                 new SpotifyPlugin({
                     api: {
