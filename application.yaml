@@ -5,6 +5,17 @@ lavalink:
   server:
     sources:
       youtube: false # disable youtube on lavalink to use youtube-source
+    filters: # All filters are enabled by default
+      volume: true
+      equalizer: true
+      karaoke: true
+      timescale: true
+      tremolo: true
+      vibrato: true
+      distortion: true
+      rotation: true
+      channelMix: true
+      lowPass: true
     password: "youshallnotpass"
     bufferDurationMs: 225
     frameBufferDurationMs: 5000
@@ -80,7 +91,7 @@ plugins:
       - "sprec:%QUERY%"
     sources:
       spotify: true
-      youtube: true
+      youtube: false
       soundcloud: true
     spotify:
       clientId: "a8b172082c064c9a8d38314a669c0779"

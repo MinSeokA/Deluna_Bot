@@ -1,6 +1,7 @@
 const { ChatInputCommandInteraction, EmbedBuilder, Colors } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const { info } = require("../../utils/Console");
 
 module.exports = new ApplicationCommand({
     command: {
@@ -27,9 +28,6 @@ module.exports = new ApplicationCommand({
                 required: true
             }
         ]
-    },
-    options: {
-        cooldown: 5000
     },
     /**
      * 
@@ -66,6 +64,7 @@ module.exports = new ApplicationCommand({
         // 플레이어가 연결되어 있지 않으면 연결 시도
         await player.connect();
 
+        player.filterManager
         if (!player.connected) {
             try {
                 await player.connect();
@@ -136,6 +135,11 @@ module.exports = new ApplicationCommand({
         player.setVolume(100);
         player.set("autoplay", false);
 
+        if (player.node.connected) {
+            info(`[Music] 연결됨`);
+        } else {
+            info(`[Music] 연결되지 않음`);
+        }
 
         if (!player.playing) {
             await player.play({ volume: `100`, paused: false });
