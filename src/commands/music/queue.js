@@ -1,6 +1,7 @@
 const { ChatInputCommandInteraction, EmbedBuilder, Colors } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const { formatMS_HHMMSS } = require("../../utils/Time");
 
 module.exports = new ApplicationCommand({
     command: {
@@ -35,11 +36,12 @@ module.exports = new ApplicationCommand({
             .setColor(Colors.Blue)
             .setTitle(`🎵 | 현재 재생 중인 음악: ${current?.info.title}`)
             .setDescription(
+                `> **전체 시간: ** ${formatMS_HHMMSS(player.queue.utils.totalDuration())} | <t:${Math.floor((Date.now() + (player.queue.utils.totalDuration() || 0)) / 1000)}:R>에 종료\n\n` +
                 `> **현재 재생 중인 음악**\n` +
                 `> 🎶 [${current?.info.title}](${current?.info.uri}) - \`${current?.info.author}\`\n\n` +
-                `> **다음 트랙들** (${player.queue.tracks.length > 20 ? "20개" : `${player.queue.tracks.length}개`}):\n` +
+                `> **다음 트랙** (${player.queue.tracks.length > 20 ? "20개" : `${player.queue.tracks.length}개`}):\n` +
                 player.queue.tracks.slice(0, 20)
-                    .map((t, i) => `> **${i + 1}.** [${t.info.title}](${t.info.uri}) - ${t.info.author}`).join("\n")
+                    .map((t, i) => `> **${i + 1}.** [${t.info.title}](${t.info.uri}) - \`${t.info.author}\``).join("\n")
             )
             .setFooter({
                 text: `총 ${player.queue.tracks.length}개의 트랙이 대기 중입니다.`,

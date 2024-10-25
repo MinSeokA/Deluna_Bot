@@ -111,7 +111,7 @@ module.exports = new ApplicationCommand({
       selfDeaf: true,
       selfMute: false,
       volume: `100`,  // 기본 볼륨
-  });
+    });
 
     let result;
 
@@ -127,7 +127,7 @@ module.exports = new ApplicationCommand({
         ephemeral: true,
       });
     }
-    
+
     await interaction.reply({
       embeds: [
         new EmbedBuilder()
@@ -139,7 +139,7 @@ module.exports = new ApplicationCommand({
     let embed = new EmbedBuilder()
       .setColor(Colors.Default) // 기본 색상 설정
       .setDescription('처리 중입니다...'); // 초기 기본 description 설정
-  
+
 
     switch (subcommand) {
       case "생성":
@@ -160,13 +160,41 @@ module.exports = new ApplicationCommand({
 
         break;
       case "추가":
+
+      if (url.startsWith("https://www.youtube.com/playlist")) {
+        return interaction.editReply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(Colors.Red)
+              .setDescription(`🚫 | 플레이리스트 링크는 사용할 수 없습니다.`),
+          ],
+          ephemeral: true,
+        });
+      }
+
         const info = await ytdl.getInfo(url); // YouTube 비디오 정보 가져오기
 
+        const res = await player.search(url, interaction.user.username);
+
+        let trackStrings = [];
+        let count = 0;
+        
+
+        if (res.loadType === "playlist") {
+          trackStrings = res.tracks.map(track => track.encoded)
+          count = res.tracks.length
+        } else if (res.loadType === "track") {
+          trackStrings = [res.tracks[0].encoded]
+          count = 1
+        } else if (res.loadType === "search") {
+          trackStrings = [res.tracks[0].encoded]
+          count = 1
+        }
 
         result = await client.api.postData("playlist/addSong", {
           playlistName: playlistName,
           song: {
-            url: url,
+            url: trackStrings,
             title: info.videoDetails.title,
             duration: info.videoDetails.lengthSeconds,
             songId: generateRandomId(8)
@@ -180,6 +208,9 @@ module.exports = new ApplicationCommand({
           embed.setColor(Colors.Red)
           embed.setDescription(`🚫 | ${result.message || `플레이리스트 **${playlistName}**에 노래를 추가하지 못했습니다!`}`);
         }
+
+
+
         // 플레이리스트를 생성합니다.
         break;
       case "목록":
@@ -203,40 +234,42 @@ module.exports = new ApplicationCommand({
         // 플레이리스트를 생성합니다.
         break;
       case "재생":
-          result = await client.api.getData(`playlist/get/${playlistName}`);
-          const songs = result.data.songs.map(song => song.url); // URL만 추출
-      
-          await player.connect(); // 음성 채널에 연결
+        result = await client.api.getData(`playlist/get/${playlistName}`);
+        const songs = result.data.songs.map(song => song.url); // URL만 추출
 
-          // 각 URL을 개별적으로 처리
-          for (const songUrl of songs) {
-              const playlist = await player.search({ query: songUrl }, interaction.user.username);
-              
-              if (playlist.loadType === "LOAD_FAILED") {
-                  embed.setColor(Colors.Red);
-                  embed.setDescription(`🚫 | 플레이리스트 **${playlistName}**를 재생하는 중 오류가 발생했습니다.`);
-                  break; // 루프 중단
-              } else if (playlist.loadType === "NO_MATCHES") {
-                  embed.setColor(Colors.Red);
-                  embed.setDescription(`🚫 | 플레이리스트 **${playlistName}**에 유효한 노래가 없습니다.`);
-                  break; // 루프 중단
-              } else if (playlist.loadType === "playlist" || playlist.loadType === "PLAYLIST_LOADED") {
-                await player.queue.add(playlist.tracks[0]); // 트랙을 대기열에 추가
-              }
+        await player.connect(); // 음성 채널에 연결
 
-              await player.queue.add(playlist.tracks[0]); // 트랙을 대기열에 추가
-            }
-            await player.setVolume(100);
-            player.set("autoplay", false);
+        const nodes = client.music.nodeManager.leastUsedNodes();
+        const node = nodes[Math.floor(Math.random() * nodes.length)];
 
-            if (!player.playing && !player.paused) {
-              await player.play(); // 플레이어가 정지 상태일 때만 플레이 시작
-          }
-            embed.setColor(Colors.Green);
-            embed.setDescription(`✅ | 플레이리스트 **${playlistName}**를 재생합니다!`);
+        // Base64 문자열 배열을 그대로 전달
+        const encodedStrings = songs.map(song => {
+          // JSON 문자열이 아니라 단순히 Base64 문자열을 리턴
+          return song.replace(/^{|"|}$/g, ''); // 중괄호와 따옴표 제거
+        });
 
-          break;
-        case "삭제":
+        const tracks = await node.decode.multipleTracks(encodedStrings, interaction.user.username);
+
+        if (tracks.length === 0) {
+          embed.setColor(Colors.Red)
+          embed.setDescription(`🚫 | 플레이리스트 **${playlistName}**에 노래가 없습니다!`);
+        }
+
+        player.queue.add(tracks);
+
+
+        await player.setVolume(100);
+        player.set("autoplay", false);
+
+        if (!player.playing && !player.paused || player.queue.tracks.length > 0) {
+          await player.play({ paused: false }); // 플레이어가 정지 상태일 때만 플레이 시작
+        }
+
+        embed.setColor(Colors.Green);
+        embed.setDescription(`✅ | 플레이리스트 **${playlistName}**를 재생합니다!`);
+
+        break;
+      case "삭제":
         // 플레이리스트를 삭제합니다.
         result = await client.api.postData("playlist/deleteSong", {
           name: playlistName,
