@@ -21,16 +21,24 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         const result = await client.api.getData('status');
 
-        // Embed
-        const embed = new EmbedBuilder()
-            .setTitle('API 상태')
-            .setDescription(result.status ? 'API가 정상적으로 작동 중입니다.' : 'API가 작동하지 않습니다.')
-            .setColor(result.status ? Colors.Green : Colors.Red)
-            .setTimestamp();
-        
-        await interaction.reply({
-            embeds: [embed],
-            ephemeral: true
-        });
+        if (result.status) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle('API 상태')
+                        .setDescription('API 서버가 정상적으로 작동중입니다.')
+                        .setColor(Colors.Green)
+                ]
+            });
+        } else {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle('API 상태')
+                        .setDescription('API 서버가 작동하지 않습니다.')
+                        .setColor(Colors.Red)
+                ]
+            });
+        }
     }
 }).toJSON();
