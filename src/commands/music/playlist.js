@@ -17,14 +17,6 @@ module.exports = new ApplicationCommand({
         type: 1, // Subcommand
         name: '재생',
         description: '플레이리스트를 재생합니다.',
-        options: [
-          {
-            type: 3, // STRING
-            name: '이름',
-            description: '플레이리스트 이름을 입력하세요.',
-            required: true
-          }
-        ]
       },
       {
         type: 1, // Subcommand
@@ -177,75 +169,40 @@ module.exports = new ApplicationCommand({
         // 플레이리스트를 생성합니다.
         break;
       case "재생":
-        const player = await client.music.getPlayer(interaction.guildId) || await client.music.createPlayer({
-          guildId: interaction.guildId,
-          voiceChannelId: voiceChannel.id,
-          textChannelId: interaction.channelId,
-          selfDeaf: true,
-          selfMute: false,
-          volume: `100`,  // 기본 볼륨
-        });
-        
-        if (!voiceChannel) {
-          return interaction.reply({
-            embeds: [
-              new EmbedBuilder()
-                .setColor(Colors.Red)
-                .setDescription(
-                  `🚫 | 이 명령어을 사용하려면 음성 채널에 있어야 합니다!`
-                ),
-            ],
-            ephemeral: true,
-          });
-        }
-    
+        result = await client.api.getData(`playlist/${interaction.user.id}`)
+
+        const embed2 = new EmbedBuilder()
+          .setColor(Colors.Default)
+          .setDescription(
+            `🔍 | 플레이리스트를 선택해주세요.
+            
+            > INFO | 플레이리스트를 선택하면 해당 플레이리스트에 추가된 노래를 재생합니다.
+          `);
+
         await interaction.reply({
-          embeds: [
-            new EmbedBuilder()
-              .setColor(Colors.Aqua)
-              .setDescription(`🔍 | 플레이리스트에 등록된 노래 찾는 중...`),
-          ],
+          embeds: [embed2],
           ephemeral: true,
-        });
-
-        
-        result = await client.api.getData(`playlist/get/${playlistName}`);
-        const songs = result.data.songs.map(song => song.url); // URL만 추출
-
-        await player.connect(); // 음성 채널에 연결
-
-        const nodes = client.music.nodeManager.leastUsedNodes();
-        const node = nodes[Math.floor(Math.random() * nodes.length)];
-
-        // Base64 문자열 배열을 그대로 전달
-        const encodedStrings = songs.map(song => {
-          // JSON 문자열이 아니라 단순히 Base64 문자열을 리턴
-          return song.replace(/^{|"|}$/g, ''); // 중괄호와 따옴표 제거
-        });
-
-        const tracks = await node.decode.multipleTracks(encodedStrings, interaction.user.username);
-
-        if (tracks.length === 0) {
-          embed.setColor(Colors.Red)
-          embed.setDescription(`🚫 | 플레이리스트 **${playlistName}**에 노래가 없습니다!`);
-        }
-
-        player.queue.add(tracks);
-
-
-        await player.setVolume(100);
-        player.set("autoplay", false);
-
-        if (!player.playing && !player.paused || player.queue.tracks.length > 0) {
-          await player.play({ paused: false }); // 플레이어가 정지 상태일 때만 플레이 시작
-        }
-
-        embed.setColor(Colors.Green);
-        embed.setDescription(`✅ | 플레이리스트 **${playlistName}**를 재생합니다!`);
-        await interaction.editReply({
-          embeds: [embed],
-          ephemeral: true
-        });
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 3,
+                  custom_id: 'playlist.play.select',
+                  label: '플레이리스트 선택',
+                  style: 1,
+                  options: result.data.map((playlist, index) => {
+                    return {
+                      label: playlist.name + ` - ${playlist.songs.length}개의 노래` || `${result.message || `플레이리스트 목록을 불러오지 못했습니다!`}`,
+                      value: playlist.name || "null",
+                    }
+                  }
+                  )
+                }
+              ]
+            }
+          ]
+        })
         break;
       case "삭제":
         // 플레이리스트를 삭제합니다.

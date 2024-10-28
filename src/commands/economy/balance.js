@@ -55,7 +55,7 @@ module.exports = new ApplicationCommand({
         embeds: [
           new EmbedBuilder()
             .setTitle('오류 발생')
-            .setDescription(data.message || `API 요청에 실패 했습니다.`)
+            .setDescription(economy.message || `API 요청에 실패 했습니다.`)
             .setColor(Colors.Red)
             .setFooter({
               text: `요청자: ${interaction.user.username}`,

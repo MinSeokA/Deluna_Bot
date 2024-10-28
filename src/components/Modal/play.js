@@ -16,6 +16,16 @@ module.exports = new Component({
     const platform = interaction.fields.getTextInputValue('play-platform');
 
     const voiceChannel = interaction.member.voice.channel;
+    
+    // 플레이어 생성
+    const player = await client.music.getPlayer(interaction.guildId) || await client.music.createPlayer({
+      guildId: interaction.guildId,
+      voiceChannelId: voiceChannel.id,
+      textChannelId: interaction.channelId,
+      selfDeaf: true,
+      selfMute: false,
+      volume: `100`,  // 기본 볼륨
+    });
 
     // 음성 채널이 없는 경우
     if (!voiceChannel) {
@@ -29,15 +39,6 @@ module.exports = new Component({
       });
     }
 
-    // 플레이어 생성
-    const player = await client.music.getPlayer(interaction.guildId) || await client.music.createPlayer({
-      guildId: interaction.guildId,
-      voiceChannelId: voiceChannel.id,
-      textChannelId: interaction.channelId,
-      selfDeaf: true,
-      selfMute: false,
-      volume: `100`,  // 기본 볼륨
-    });
 
     // 플레이어가 연결되어 있지 않으면 연결 시도
     await player.connect();
@@ -121,7 +122,7 @@ module.exports = new Component({
       embeds: [
         new EmbedBuilder()
           .setColor(Colors.Green)
-          .setDescription(`✅ | **${track.info.title}** 노래가 큐에 추가되었습니다!`)
+          .setDescription(`✅ | **${track.info.title}** 노래가 재생목록에 추가되었습니다!`)
           .addFields(
             { name: '아티스트', value: track.info.author, inline: true },
             { name: '길이', value: `${track.info.duration / 1000}s`, inline: true },

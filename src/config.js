@@ -3,13 +3,13 @@ const config = {
         path: './database.yml' // 데이터베이스 경로.
     },
     api: {
-        baseURL: 'https://deluna-api.lunaiz.com', // Deluna API의 기본 URL.
+        baseURL: 'http://localhost:3000', // Deluna API의 기본 URL.
         dev: {
             baseURL: 'http://localhost:3000' // Deluna API의 개발 URL.
         }
     },
     development: {
-        enabled: true, // true일 경우, 봇이 특정 길드에 모든 애플리케이션 커맨드를 등록합니다 (전역이 아님).
+        enabled: false, // true일 경우, 봇이 특정 길드에 모든 애플리케이션 커맨드를 등록합니다 (전역이 아님).
         guildId: '1233056873100476516',
     },
     commands: {
