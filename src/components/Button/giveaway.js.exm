@@ -1,0 +1,37 @@
+const { ButtonInteraction, EmbedBuilder, Colors } = require("discord.js");
+const DiscordBot = require("../../client/DiscordBot");
+const Component = require("../../structure/Component");
+
+module.exports = new Component({
+    customId: /^giveaway\.register\.button_\d+$/, // 정규 표현식 사용
+    type: 'button',
+    run: async (client, interaction) => {
+        console.log(interaction.customId); // custom ID 로깅
+        const giveawayId = interaction.customId.split('_')[1]; // 이벤트 ID 추출
+        try {
+            const response = await client.api.getData(`giveaway/${giveawayId}`);
+            const participants = response.data.participants || [];
+            const registeredCount = participants.length;
+
+            if (participants.includes(interaction.user.id)) {
+                return interaction.reply({ content: "이미 이벤트에 참가하셨습니다.", ephemeral: true });
+            }
+
+            participants.push(interaction.user.id);
+            await client.api.postData(`giveaway/${giveawayId}/register`, {
+                participants
+            });
+
+            const embed = new EmbedBuilder()
+                .setTitle(`${response.data.title} 이벤트 참여 완료`)
+                .setDescription(`현재까지 등록된 참가자 수: ${registeredCount + 1}`)
+                .setColor(Colors.Green);
+
+            await interaction.deferUpdate(); // Acknowledge the interaction
+            await interaction.editReply({ embeds: [embed], components: [] });
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({ content: "이벤트 참가 처리 중 오류가 발생했습니다.", ephemeral: true });
+        }
+    }
+}).toJSON();

@@ -43,6 +43,7 @@ class ComponentsHandler {
                             }
                             case 'button': {
                                 this.client.collection.components.buttons.set(module.customId, module);
+                                success(`Loaded button customId: ${module.customId}`); // 실제 customId 출력
                                 break;
                             }
                             default: {

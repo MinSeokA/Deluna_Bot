@@ -9,7 +9,7 @@ const config = {
         }
     },
     development: {
-        enabled: false, // true일 경우, 봇이 특정 길드에 모든 애플리케이션 커맨드를 등록합니다 (전역이 아님).
+        enabled: true, // true일 경우, 봇이 특정 길드에 모든 애플리케이션 커맨드를 등록합니다 (전역이 아님).
         guildId: '1233056873100476516',
     },
     commands: {

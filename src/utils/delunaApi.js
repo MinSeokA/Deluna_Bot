@@ -20,7 +20,6 @@ class API {
             const response = await this.api.get(`/${parameter}`);
             return response.data; // 응답 데이터를 반환
         } catch (error) {
-            console.error('API 요청 실패:', error);
             throw error; // 에러를 호출자에게 전달
         }
     }
@@ -38,7 +37,37 @@ class API {
             });
             return response.data; // 응답 데이터를 반환
         } catch (error) {
-            console.error('API 요청 실패:', error);
+            throw error; // 에러를 호출자에게 전달
+        }
+    }
+
+    /**
+     * PUT 요청을 보내고 데이터를 업데이트합니다.
+     * @param {string} parameter - 요청할 파라미터
+     * @param {Object} data - 보낼 JSON 데이터
+     * @returns {Promise<Object>} - 응답 데이터
+     */
+    async putData(parameter, data) {
+        try {
+            const response = await this.api.put(`/${parameter}`, {
+                ...data
+            });
+            return response.data; // 응답 데이터를 반환
+        } catch (error) {
+            throw error; // 에러를 호출자에게 전달
+        }
+    }
+
+    /**
+     * DELETE 요청을 보내고 데이터를 삭제합니다.
+     * @param {string} parameter - 요청할 파라미터
+     * @returns {Promise<Object>} - 응답 데이터
+     */
+    async deleteData(parameter) {
+        try {
+            const response = await this.api.delete(`/${parameter}`);
+            return response.data; // 응답 데이터를 반환
+        } catch (error) {
             throw error; // 에러를 호출자에게 전달
         }
     }

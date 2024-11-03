@@ -48,6 +48,24 @@ class DiscordBot extends Client {
   api = new require('../utils/delunaApi');
 
   /**
+   * @type {import('../utils/Logging')}
+   * @memberof DiscordBot
+   * @readonly
+   * @instance
+   * @name logging
+  */
+  logging = new require('../utils/Logging');
+
+  /**
+ * @type {import('../utils/Cache')}
+ * @memberof DiscordBot
+ * @readonly
+ * @instance
+ * @name logging
+*/
+  cache = new require('../utils/Cache');
+
+  /**
 * Distube 음악 플레이어
 * @type {import("lavalink-client").LavalinkManager}
 * @memberof DiscordBot
